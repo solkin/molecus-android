@@ -4,6 +4,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,6 +57,9 @@ public class MainActivity extends AppCompatActivity
     @ViewById
     RecyclerView list;
 
+    @ViewById
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Bean
     UserHolder userHolder;
 
@@ -82,6 +86,34 @@ public class MainActivity extends AppCompatActivity
 
         navView.setNavigationItemSelectedListener(this);
 
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                final SceneRequest request = new SceneRequest();
+                requestExecutor.execute(request, new RequestCallback<ProjectsResponse>() {
+                    @Override
+                    public void onSuccess(ProjectsResponse response) {
+                        updateProjects(response.getProjects());
+                    }
+
+                    @Override
+                    public void onFailed(Request.RequestException ex) {
+                        requestExecutor.execute(request, this, 2500);
+                    }
+
+                    @Override
+                    public void onUnauthorized() {
+                        // TODO: show authorization activity if running.
+                    }
+
+                    @Override
+                    public void onRetry() {
+                        requestExecutor.execute(request, this);
+                    }
+                });
+            }
+        });
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         list.setLayoutManager(linearLayoutManager);
         list.setHasFixedSize(false);
@@ -93,34 +125,13 @@ public class MainActivity extends AppCompatActivity
     void updateProjects(List<Project> projects) {
         adapter.setProjects(projects);
         adapter.notifyDataSetChanged();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Click
     void createProject(View view) {
         Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
-        final SceneRequest request = new SceneRequest();
-        requestExecutor.execute(request, new RequestCallback<ProjectsResponse>() {
-            @Override
-            public void onSuccess(ProjectsResponse response) {
-                updateProjects(response.getProjects());
-            }
-
-            @Override
-            public void onFailed(Request.RequestException ex) {
-                requestExecutor.execute(request, this, 2500);
-            }
-
-            @Override
-            public void onUnauthorized() {
-                // TODO: show authorization activity if running.
-            }
-
-            @Override
-            public void onRetry() {
-                requestExecutor.execute(request, this);
-            }
-        });
     }
 
     @Override
@@ -155,17 +166,17 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_scene) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_all_projects) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_feed) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_my_projects) {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_subscribers) {
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_dialogs) {
 
         }
 
