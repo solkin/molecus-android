@@ -7,6 +7,7 @@ import com.tomclaw.molecus.util.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -40,6 +41,9 @@ public abstract class HttpRequest<A extends Response> extends Request<A> {
         } catch (RequestException e) {
             Logger.log("Request exception", e);
             throw e;
+        } catch (InterruptedIOException | InterruptedException e) {
+            Logger.log("Request interrupted", e);
+            throw new RequestCancelledException();
         } catch (Throwable e) {
             Logger.log("Unable to execute request due to exception", e);
             throw new RequestPendingException();

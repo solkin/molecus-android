@@ -12,6 +12,7 @@ import org.androidannotations.annotations.RootContext;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by solkin on 16/02/16.
@@ -20,7 +21,6 @@ import java.util.concurrent.Executors;
 public class RequestExecutor {
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
-    private final ExecutorService delayedExecutor = Executors.newSingleThreadExecutor();
 
     @RootContext
     Context context;
@@ -28,24 +28,9 @@ public class RequestExecutor {
     @Bean
     UserHolder userHolder;
 
-    public <S extends Response, R extends Request<S>> void execute(
+    public <S extends Response, R extends Request<S>> Future<?> execute(
             R request, RequestCallback<S> callback) {
-        executor.submit(new RequestWrapper<>(context, userHolder, request, callback));
-    }
-
-    public <S extends Response, R extends Request<S>> void execute(
-            final R request, final RequestCallback<S> callback, final long delay) {
-        delayedExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                execute(request, callback);
-            }
-        });
+        return executor.submit(new RequestWrapper<>(context, userHolder, request, callback));
     }
 
     public static class RequestWrapper<S extends Response, R extends Request<S>> implements Runnable {
@@ -83,6 +68,8 @@ public class RequestExecutor {
                             callback.onUnauthorized();
                         }
                     }
+                } catch (Request.RequestCancelledException ex) {
+                    callback.onCancelled();
                 } catch (Request.RequestException ex) {
                     callback.onFailed(ex);
                 }

@@ -12,4 +12,6 @@ public interface RequestCallback<R extends Response> {
     void onUnauthorized();
 
     void onRetry();
+
+    void onCancelled();
 }

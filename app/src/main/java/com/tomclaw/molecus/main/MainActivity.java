@@ -17,11 +17,12 @@ import com.tomclaw.molecus.R;
 import com.tomclaw.molecus.core.Request;
 import com.tomclaw.molecus.core.RequestCallback;
 import com.tomclaw.molecus.core.RequestExecutor;
-import com.tomclaw.molecus.core.Response;
 import com.tomclaw.molecus.core.UserHolder;
 import com.tomclaw.molecus.main.adapters.ProjectsAdapter;
+import com.tomclaw.molecus.molecus.AllProjectsRequest;
 import com.tomclaw.molecus.molecus.ProjectsResponse;
 import com.tomclaw.molecus.molecus.SceneRequest;
+import com.tomclaw.molecus.molecus.UserProjectsRequest;
 import com.tomclaw.molecus.molecus.dto.Project;
 
 import org.androidannotations.annotations.AfterInject;
@@ -37,6 +38,7 @@ import org.androidannotations.annotations.ViewById;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main)
@@ -68,6 +70,9 @@ public class MainActivity extends AppCompatActivity
 
     ProjectsAdapter adapter;
 
+    Request request;
+    Future<?> future;
+
     @AfterInject
     void checkUser() {
         if (!userHolder.getUser().isAuthorized()) {
@@ -89,28 +94,7 @@ public class MainActivity extends AppCompatActivity
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                final SceneRequest request = new SceneRequest();
-                requestExecutor.execute(request, new RequestCallback<ProjectsResponse>() {
-                    @Override
-                    public void onSuccess(ProjectsResponse response) {
-                        updateProjects(response.getProjects());
-                    }
-
-                    @Override
-                    public void onFailed(Request.RequestException ex) {
-                        requestExecutor.execute(request, this, 2500);
-                    }
-
-                    @Override
-                    public void onUnauthorized() {
-                        // TODO: show authorization activity if running.
-                    }
-
-                    @Override
-                    public void onRetry() {
-                        requestExecutor.execute(request, this);
-                    }
-                });
+                refreshProjects();
             }
         });
 
@@ -119,6 +103,55 @@ public class MainActivity extends AppCompatActivity
         list.setHasFixedSize(false);
         adapter = new ProjectsAdapter(this, Collections.<Project>emptyList());
         list.setAdapter(adapter);
+
+        navView.getMenu().getItem(0).setChecked(true);
+        onNavigationItemSelected(navView.getMenu().getItem(0));
+    }
+
+    void requestProjects(Request request) {
+        if (future != null && !future.isDone()) {
+            future.cancel(true);
+        }
+        this.request = request;
+        refreshProjects();
+    }
+
+    @UiThread(delay = 2500L)
+    void refreshProjectsWithDelay() {
+        refreshProjects();
+    }
+
+    @UiThread
+    void refreshProjects() {
+        if (request != null) {
+            future = requestExecutor.execute(request, new RequestCallback<ProjectsResponse>() {
+                @Override
+                public void onSuccess(ProjectsResponse response) {
+                    updateProjects(response.getProjects());
+                }
+
+                @Override
+                public void onFailed(Request.RequestException ex) {
+                    refreshProjectsWithDelay();
+                }
+
+                @Override
+                public void onUnauthorized() {
+                    // TODO: show authorization activity if running.
+                }
+
+                @Override
+                public void onRetry() {
+                    refreshProjects();
+                }
+
+                @Override
+                public void onCancelled() {
+                    // Nothing to do at all.
+                }
+            });
+            swipeRefreshLayout.setRefreshing(true);
+        }
     }
 
     @UiThread
@@ -163,21 +196,24 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_scene) {
-            // Handle the camera action
-        } else if (id == R.id.nav_all_projects) {
-
-        } else if (id == R.id.nav_feed) {
-
-        } else if (id == R.id.nav_my_projects) {
-
-        } else if (id == R.id.nav_subscribers) {
-
-        } else if (id == R.id.nav_dialogs) {
-
+        switch (id) {
+            case R.id.nav_scene:
+                requestProjects(new SceneRequest());
+                break;
+            case R.id.nav_all_projects:
+                requestProjects(new AllProjectsRequest(0, 100));
+                break;
+            case R.id.nav_my_projects:
+                requestProjects(new UserProjectsRequest(userHolder.getUser().getNick(), 0, 100));
+                break;
+            case R.id.nav_feed:
+                break;
+            case R.id.nav_subscribers:
+                break;
+            case R.id.nav_dialogs:
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

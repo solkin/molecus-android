@@ -44,6 +44,7 @@ public abstract class ProjectsRequest extends MolecusRequest<ProjectsResponse> {
         builder.appendParam("type", type.toString())
                 .appendParam("offset", offset)
                 .appendParam("count", count);
+        appendProjectsParams(builder);
     }
 
     protected abstract void appendProjectsParams(HttpParamsBuilder builder);

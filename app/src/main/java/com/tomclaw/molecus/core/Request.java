@@ -103,6 +103,9 @@ public abstract class Request<A extends Response> extends SugarRecord implements
     public static class RequestDeleteException extends RequestException {
     }
 
+    public static class RequestCancelledException extends RequestException {
+    }
+
     @Override
     public String toString() {
         return "Request{" +
