@@ -1,27 +1,25 @@
 package com.tomclaw.molecus.util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.EBean;
+
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
 /**
  * Created by solkin on 01/03/14.
  */
+@EBean(scope = EBean.Scope.Singleton)
 public class GsonSingleton {
-
-    private static class Holder {
-
-        static GsonSingleton instance = new GsonSingleton();
-    }
-
-    public static GsonSingleton getInstance() {
-        return Holder.instance;
-    }
 
     private Gson gson;
 
-    public GsonSingleton() {
-        gson = new Gson();
+    @AfterInject
+    void init() {
+        gson = new GsonBuilder().setExclusionStrategies(new ExcludeFieldsStrategy()).create();
     }
 
     public Gson getGson() {

@@ -5,6 +5,7 @@ import com.tomclaw.molecus.util.GsonSingleton;
 import com.tomclaw.molecus.util.Logger;
 
 import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
@@ -21,6 +22,9 @@ public class UserHolder {
 
     @RootContext
     Context context;
+
+    @Bean
+    GsonSingleton gsonSingleton;
 
     private User user;
 
@@ -49,7 +53,7 @@ public class UserHolder {
                 total.append(line);
             }
             Logger.log(total.toString());
-            User loadedUser = GsonSingleton.getInstance().fromJson(total.toString(), User.class);
+            User loadedUser = gsonSingleton.fromJson(total.toString(), User.class);
             if (loadedUser != null) {
                 user = loadedUser;
             }
@@ -73,7 +77,7 @@ public class UserHolder {
             }
             stream = new FileOutputStream(userFile);
             OutputStreamWriter w = new OutputStreamWriter(stream);
-            String json = GsonSingleton.getInstance().toJson(user);
+            String json = gsonSingleton.toJson(user);
             w.write(json);
             w.flush();
         } catch (Throwable ex) {

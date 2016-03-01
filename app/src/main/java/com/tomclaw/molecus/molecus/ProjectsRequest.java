@@ -1,19 +1,18 @@
 package com.tomclaw.molecus.molecus;
 
 import com.google.gson.reflect.TypeToken;
-import com.tomclaw.molecus.core.Response;
 import com.tomclaw.molecus.molecus.dto.Project;
 import com.tomclaw.molecus.util.GsonSingleton;
 import com.tomclaw.molecus.util.HttpParamsBuilder;
-import com.tomclaw.molecus.util.HttpUtil;
-import com.tomclaw.molecus.util.Logger;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.tomclaw.molecus.main.Beans.gsonSingleton;
 
 /**
  * Created by Solkin on 03.11.2015.
@@ -56,7 +55,7 @@ public abstract class ProjectsRequest extends MolecusRequest<ProjectsResponse> {
             int total = response.getInt("total");
             String projectsJson = response.getJSONArray("projects").toString();
             Type listType = new TypeToken<ArrayList<Project>>() {}.getType();
-            List<Project> projects = GsonSingleton.getInstance().fromJson(projectsJson, listType);
+            List<Project> projects = gsonSingleton().fromJson(projectsJson, listType);
             return new ProjectsResponse(status, total, projects);
         }
         return new ProjectsResponse(status);

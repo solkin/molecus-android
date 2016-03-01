@@ -5,4 +5,5 @@ package com.tomclaw.molecus.core;
  */
 public class Settings {
     public static final String LOG_TAG = "molecus-app";
+    public static final boolean DEV = true;
 }

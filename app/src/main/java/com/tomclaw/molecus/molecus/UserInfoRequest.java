@@ -8,6 +8,8 @@ import com.tomclaw.molecus.util.HttpParamsBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.tomclaw.molecus.main.Beans.gsonSingleton;
+
 /**
  * Created by Solkin on 03.11.2015.
  */
@@ -44,8 +46,7 @@ public class UserInfoRequest extends MolecusRequest<UserInfoResponse> {
         int status = response.getInt("status");
         if (status == 200) {
             JSONObject userObject = response.getJSONObject("user");
-            return GsonSingleton.getInstance().fromJson(
-                    userObject.toString(), UserInfoResponse.class);
+            return gsonSingleton().fromJson(userObject.toString(), UserInfoResponse.class);
         }
         return new UserInfoResponse(status);
     }

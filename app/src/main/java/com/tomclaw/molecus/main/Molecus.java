@@ -23,6 +23,7 @@ public class Molecus extends SugarApp {
     public void onCreate() {
         instance = this;
         super.onCreate();
+        Beans.createBeans(this);
         shortRequestDispatcher = new RequestDispatcher(Request.REQUEST_TYPE_SHORT);
         uploadRequestDispatcher = new RequestDispatcher(Request.REQUEST_TYPE_UPLOAD);
         initImageLoader(this);

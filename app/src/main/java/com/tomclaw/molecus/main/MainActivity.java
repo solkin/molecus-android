@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.orm.SugarRecord;
 import com.tomclaw.molecus.R;
 import com.tomclaw.molecus.core.Request;
 import com.tomclaw.molecus.core.RequestCallback;
@@ -156,6 +157,8 @@ public class MainActivity extends AppCompatActivity
 
     @UiThread
     void updateProjects(List<Project> projects) {
+        SugarRecord.saveInTx(projects);
+
         adapter.setProjects(projects);
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
