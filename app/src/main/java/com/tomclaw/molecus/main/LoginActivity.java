@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @UiThread(propagation = UiThread.Propagation.REUSE)
     void onAuthenticationOk() {
-        setResult(RESULT_OK);
+        MainActivity_.intent(this).start();
         finish();
     }
 

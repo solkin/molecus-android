@@ -48,8 +48,6 @@ import java.util.concurrent.Future;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final int REQUEST_CODE_LOGIN = 0x01;
-
     @ViewById
     Toolbar toolbar;
 
@@ -82,15 +80,14 @@ public class MainActivity extends AppCompatActivity
     Request request;
     Future<?> future;
 
-    @AfterInject
-    void checkUser() {
-        if (!userHolder.getUser().isAuthorized()) {
-            LoginActivity_.intent(this).startForResult(REQUEST_CODE_LOGIN);
-        }
-    }
-
     @AfterViews
     void init() {
+        if (!userHolder.getUser().isAuthorized()) {
+            LoginActivity_.intent(this).start();
+            finish();
+            return;
+        }
+
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -199,13 +196,6 @@ public class MainActivity extends AppCompatActivity
     @OptionsItem
     boolean actionSettings() {
         return true;
-    }
-
-    @OnActivityResult(REQUEST_CODE_LOGIN)
-    void onResult(int resultCode) {
-        if (resultCode != RESULT_OK) {
-            finish();
-        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
