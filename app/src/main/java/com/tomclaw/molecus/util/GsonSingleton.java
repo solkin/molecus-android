@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.EBean;
 
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
 /**

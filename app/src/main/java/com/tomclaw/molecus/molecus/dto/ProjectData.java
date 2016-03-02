@@ -1,5 +1,6 @@
 package com.tomclaw.molecus.molecus.dto;
 
+import com.orm.dsl.Table;
 import com.tomclaw.molecus.util.Unobfuscatable;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 /**
  * Created by Solkin on 04.11.2015.
  */
+@Table
 public class ProjectData implements Unobfuscatable {
 
     private List<String> url_list;

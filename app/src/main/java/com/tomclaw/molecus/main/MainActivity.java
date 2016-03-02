@@ -13,18 +13,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.orm.SugarRecord;
 import com.tomclaw.molecus.R;
 import com.tomclaw.molecus.core.Request;
 import com.tomclaw.molecus.core.RequestCallback;
 import com.tomclaw.molecus.core.RequestExecutor;
 import com.tomclaw.molecus.core.UserHolder;
 import com.tomclaw.molecus.main.adapters.ProjectsAdapter;
+import com.tomclaw.molecus.main.controllers.ProjectCache;
+import com.tomclaw.molecus.main.controllers.UserInfoCache;
 import com.tomclaw.molecus.molecus.AllProjectsRequest;
 import com.tomclaw.molecus.molecus.ProjectsResponse;
 import com.tomclaw.molecus.molecus.SceneRequest;
 import com.tomclaw.molecus.molecus.UserProjectsRequest;
 import com.tomclaw.molecus.molecus.dto.Project;
+import com.tomclaw.molecus.molecus.dto.UserInfo;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
@@ -68,6 +70,12 @@ public class MainActivity extends AppCompatActivity
 
     @Bean
     RequestExecutor requestExecutor;
+
+    @Bean
+    UserInfoCache userInfoCache;
+
+    @Bean
+    ProjectCache projectCache;
 
     ProjectsAdapter adapter;
 
@@ -128,7 +136,13 @@ public class MainActivity extends AppCompatActivity
             future = requestExecutor.execute(request, new RequestCallback<ProjectsResponse>() {
                 @Override
                 public void onSuccess(ProjectsResponse response) {
-                    updateProjects(response.getProjects());
+                    List<Project> projects = response.getProjects();
+                    projectCache.saveProjects(projects, new ProjectCache.ProjectsCallback() {
+                        @Override
+                        public void onSaved(List<Project> projects) {
+                            updateProjects(projects);
+                        }
+                    });
                 }
 
                 @Override
@@ -157,8 +171,6 @@ public class MainActivity extends AppCompatActivity
 
     @UiThread
     void updateProjects(List<Project> projects) {
-        SugarRecord.saveInTx(projects);
-
         adapter.setProjects(projects);
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
@@ -209,7 +221,24 @@ public class MainActivity extends AppCompatActivity
                 requestProjects(new AllProjectsRequest(0, 100));
                 break;
             case R.id.nav_my_projects:
-                requestProjects(new UserProjectsRequest(userHolder.getUser().getNick(), 0, 100));
+                userInfoCache.getUserInfo(userHolder.getUser().getNick(),
+                        new UserInfoCache.UserInfoCallback() {
+                            @Override
+                            public void onUserInfo(UserInfo userInfo) {
+                                List<Project> projects = projectCache.getProjectsSync(userInfo.getId());
+                                updateProjects(projects);
+                                updateFromServer();
+                            }
+
+                            @Override
+                            public void onNotFound() {
+                                updateFromServer();
+                            }
+
+                            void updateFromServer() {
+                                requestProjects(new UserProjectsRequest(userHolder.getUser().getNick(), 0, 100));
+                            }
+                        });
                 break;
             case R.id.nav_feed:
                 break;

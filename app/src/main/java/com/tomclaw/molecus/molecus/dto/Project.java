@@ -1,8 +1,8 @@
 package com.tomclaw.molecus.molecus.dto;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.orm.dsl.Table;
+import com.orm.dsl.Unique;
 import com.tomclaw.molecus.molecus.DevHelper;
 import com.tomclaw.molecus.util.ExcludeField;
 import com.tomclaw.molecus.util.Unobfuscatable;
@@ -17,6 +17,7 @@ public class Project implements Unobfuscatable {
     private Long id;
 
     @SerializedName("id")
+    @Unique
     private String projectId;
     private String title;
     private UserInfo user;
@@ -82,5 +83,9 @@ public class Project implements Unobfuscatable {
 
     public int getType() {
         return type;
+    }
+
+    public void setUserInfo(UserInfo user) {
+        this.user = user;
     }
 }
