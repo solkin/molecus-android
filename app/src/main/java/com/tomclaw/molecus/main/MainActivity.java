@@ -12,11 +12,15 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.tomclaw.molecus.R;
 import com.tomclaw.molecus.core.Request;
 import com.tomclaw.molecus.core.RequestCallback;
 import com.tomclaw.molecus.core.RequestExecutor;
+import com.tomclaw.molecus.core.User;
 import com.tomclaw.molecus.core.UserHolder;
 import com.tomclaw.molecus.main.adapters.ProjectsAdapter;
 import com.tomclaw.molecus.main.controllers.ProjectCache;
@@ -28,14 +32,13 @@ import com.tomclaw.molecus.molecus.UserProjectsRequest;
 import com.tomclaw.molecus.molecus.dto.Project;
 import com.tomclaw.molecus.molecus.dto.UserInfo;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -62,6 +65,12 @@ public class MainActivity extends AppCompatActivity
 
     @ViewById
     SwipeRefreshLayout swipeRefreshLayout;
+
+    ImageView userAvatar;
+
+    TextView userNick;
+
+    TextView userLogin;
 
     @Bean
     UserHolder userHolder;
@@ -112,6 +121,23 @@ public class MainActivity extends AppCompatActivity
 
         navView.getMenu().getItem(0).setChecked(true);
         onNavigationItemSelected(navView.getMenu().getItem(0));
+
+        View header = navView.getHeaderView(0);
+        userAvatar = (ImageView) header.findViewById(R.id.user_avatar);
+        userNick = (TextView) header.findViewById(R.id.user_nick);
+        userLogin = (TextView) header.findViewById(R.id.user_login);
+
+        updateUser();
+    }
+
+    @SupposeUiThread
+    void updateUser() {
+        User user = userHolder.getUser();
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        imageLoader.displayImage(user.getAvatar(), userAvatar,
+                ImageOptions.getAvatarOptions());
+        userNick.setText(user.getNick());
+        userLogin.setText(user.getLogin());
     }
 
     void requestProjects(Request request) {
