@@ -44,13 +44,39 @@ public class ProjectCache {
             });
 
     @Background(serial = SUGAR)
-    public void getProjects(long userInfoId, ProjectsCallback callback) {
-        List<Project> projects = getProjectsSync(userInfoId);
-        callback.onSaved(projects);
+    public void getProjectsRandom(int count, ProjectsCallback callback) {
+        List<Project> projects = getProjectsRandomSync(count);
+        callback.onProjects(projects);
+    }
+
+    @Background(serial = SUGAR)
+    public void getProjectsByLimit(int limit, ProjectsCallback callback) {
+        List<Project> projects = getProjectsByLimitSync(limit);
+        callback.onProjects(projects);
+    }
+
+    @Background(serial = SUGAR)
+    public void getProjectsByUserInfo(long userInfoId, ProjectsCallback callback) {
+        List<Project> projects = getProjectsByUserInfoSync(userInfoId);
+        callback.onProjects(projects);
     }
 
     @SupposeBackground(serial = SUGAR)
-    public List<Project> getProjectsSync(long userInfoId) {
+    List<Project> getProjectsRandomSync(int count) {
+        List<Project> projects = SugarRecord.find(Project.class, null, null, null, "RANDOM()", String.valueOf(count));
+        mergeCached(projects);
+        return projects;
+    }
+
+    @SupposeBackground(serial = SUGAR)
+    List<Project> getProjectsByLimitSync(int limit) {
+        List<Project> projects = SugarRecord.find(Project.class, null, null, null, null, String.valueOf(limit));
+        mergeCached(projects);
+        return projects;
+    }
+
+    @SupposeBackground(serial = SUGAR)
+    List<Project> getProjectsByUserInfoSync(long userInfoId) {
         List<Project> projects = SugarRecord.find(Project.class, "user = ?", Long.toString(userInfoId));
         mergeCached(projects);
         return projects;
@@ -80,7 +106,7 @@ public class ProjectCache {
 
         SugarRecord.saveInTx(projects);
 
-        callback.onSaved(projects);
+        callback.onProjects(projects);
     }
 
     @SupposeBackground(serial = SUGAR)
@@ -98,7 +124,7 @@ public class ProjectCache {
     }
 
     public interface ProjectsCallback {
-        void onSaved(List<Project> projects);
+        void onProjects(List<Project> projects);
     }
 
     private class NoProjectsException extends Exception {

@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
                     List<Project> projects = response.getProjects();
                     projectCache.saveProjects(projects, new ProjectCache.ProjectsCallback() {
                         @Override
-                        public void onSaved(List<Project> projects) {
+                        public void onProjects(List<Project> projects) {
                             updateProjects(projects);
                         }
                     });
@@ -215,19 +215,35 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_scene:
-                requestProjects(new SceneRequest());
+                projectCache.getProjectsRandom(SceneRequest.SCENE_PROJECTS_COUNT, new ProjectCache.ProjectsCallback() {
+                    @Override
+                    public void onProjects(List<Project> projects) {
+                        updateProjects(projects);
+                        requestProjects(new SceneRequest());
+                    }
+                });
                 break;
             case R.id.nav_all_projects:
-                requestProjects(new AllProjectsRequest(0, 100));
+                projectCache.getProjectsByLimit(100, new ProjectCache.ProjectsCallback() {
+                    @Override
+                    public void onProjects(List<Project> projects) {
+                        updateProjects(projects);
+                        requestProjects(new AllProjectsRequest(0, 100));
+                    }
+                });
                 break;
             case R.id.nav_my_projects:
                 userInfoCache.getUserInfo(userHolder.getUser().getNick(),
                         new UserInfoCache.UserInfoCallback() {
                             @Override
                             public void onUserInfo(UserInfo userInfo) {
-                                List<Project> projects = projectCache.getProjectsSync(userInfo.getId());
-                                updateProjects(projects);
-                                updateFromServer();
+                                projectCache.getProjectsByUserInfo(userInfo.getId(), new ProjectCache.ProjectsCallback() {
+                                    @Override
+                                    public void onProjects(List<Project> projects) {
+                                        updateProjects(projects);
+                                        updateFromServer();
+                                    }
+                                });
                             }
 
                             @Override

@@ -7,7 +7,7 @@ import com.tomclaw.molecus.util.HttpParamsBuilder;
  */
 public class SceneRequest extends ProjectsRequest {
 
-    private static final int SCENE_PROJECTS_COUNT = 16;
+    public static final int SCENE_PROJECTS_COUNT = 16;
 
     public SceneRequest() {
         super(ProjectsType.scene, 0, SCENE_PROJECTS_COUNT);
