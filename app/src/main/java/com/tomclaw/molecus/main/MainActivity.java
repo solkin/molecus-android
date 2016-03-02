@@ -231,6 +231,7 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_scene:
+                setTitle(R.string.scene);
                 projectCache.getProjectsRandom(SceneRequest.SCENE_PROJECTS_COUNT, new ProjectCache.ProjectsCallback() {
                     @Override
                     public void onProjects(List<Project> projects) {
@@ -240,7 +241,8 @@ public class MainActivity extends AppCompatActivity
                 });
                 break;
             case R.id.nav_all_projects:
-                projectCache.getProjectsByLimit(100, new ProjectCache.ProjectsCallback() {
+                setTitle(R.string.all_projects);
+                projectCache.getProjectsByLimit(50, new ProjectCache.ProjectsCallback() {
                     @Override
                     public void onProjects(List<Project> projects) {
                         updateProjects(projects);
@@ -249,6 +251,7 @@ public class MainActivity extends AppCompatActivity
                 });
                 break;
             case R.id.nav_my_projects:
+                setTitle(R.string.my_projects);
                 userInfoCache.getUserInfo(userHolder.getUser().getNick(),
                         new UserInfoCache.UserInfoCallback() {
                             @Override
