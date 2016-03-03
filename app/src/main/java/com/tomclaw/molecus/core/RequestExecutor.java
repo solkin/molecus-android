@@ -80,11 +80,16 @@ public class RequestExecutor {
             AuthRequest request = new AuthRequest(userHolder.getUser().getRefreshToken());
             try {
                 AuthResponse response = request.onRequest(userHolder, context);
-                userHolder.getUser().setData(userHolder.getUser().getLogin(),
-                        response.getAccessToken(),
-                        response.getRefreshToken(),
-                        response.getExpiresIn());
-                return true;
+                if (response.isSuccess()) {
+                    userHolder.getUser().setData(
+                            userHolder.getUser().getLogin(),
+                            response.getAccessToken(),
+                            response.getRefreshToken(),
+                            response.getExpiresIn());
+                    return true;
+                } else {
+                    throw new Request.RequestPendingException();
+                }
             } catch (Request.RequestException ex) {
                 userHolder.getUser().setUnauthorized();
                 return false;
