@@ -2,7 +2,6 @@ package com.tomclaw.molecus.molecus;
 
 import com.google.gson.reflect.TypeToken;
 import com.tomclaw.molecus.molecus.dto.Project;
-import com.tomclaw.molecus.util.GsonSingleton;
 import com.tomclaw.molecus.util.HttpParamsBuilder;
 
 import org.json.JSONException;

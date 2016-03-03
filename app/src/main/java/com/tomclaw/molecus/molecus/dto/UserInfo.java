@@ -15,10 +15,11 @@ public class UserInfo implements Unobfuscatable {
     @ExcludeField
     private Long id;
 
-    private String userid;
     @Unique
     private String nick;
     private String avatar;
+    private Integer online;
+    private Subscription subscription;
 
     public UserInfo() {
     }
@@ -31,15 +32,37 @@ public class UserInfo implements Unobfuscatable {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userid;
-    }
-
     public String getNick() {
         return nick;
     }
 
     public String getAvatar() {
         return DevHelper.fixUrls(avatar);
+    }
+
+    public Subscription getSubscription() {
+        return subscription;
+    }
+
+    public boolean isOnline() {
+        return online != null && online == 1;
+    }
+
+    public void update(UserInfo userInfo) {
+        this.nick = userInfo.nick;
+        this.avatar = userInfo.avatar;
+        if (userInfo.online != null) {
+            this.online = userInfo.online;
+        }
+        if (userInfo.subscription != null) {
+            this.subscription = userInfo.subscription;
+        }
+    }
+
+    public enum Subscription {
+        none,
+        from,
+        to,
+        both
     }
 }

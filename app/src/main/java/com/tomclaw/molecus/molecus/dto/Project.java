@@ -88,4 +88,17 @@ public class Project implements Unobfuscatable {
     public void setUserInfo(UserInfo user) {
         this.user = user;
     }
+
+    public void update(Project project) {
+        this.projectId = project.projectId;
+        this.title = project.title;
+        this.category = project.category;
+        this.time_added = project.time_added;
+        this.likes = project.likes;
+        this.views = project.views;
+        this.liked = project.liked;
+        this.cover = project.cover;
+        this.type = project.type;
+        this.data.update(project.data);
+    }
 }

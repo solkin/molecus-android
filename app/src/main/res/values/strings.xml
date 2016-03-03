@@ -8,6 +8,7 @@
 
     <string name="please_wait">Пожалуйста, подождите…</string>
     <string name="title_activity_login">Войти</string>
+    <string name="title_activity_subscribers">Друзья</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -25,4 +26,6 @@
     <string name="feed">Лента</string>
     <string name="subscribers">Друзья</string>
     <string name="dialogs">Диалоги</string>
+
+    <string name="subscriber_online">В сети</string>
 </resources>

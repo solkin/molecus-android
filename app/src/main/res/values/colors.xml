@@ -5,4 +5,5 @@
     <color name="colorAccent">#454545</color>
 
     <color name="tintGrey">#b6b6b6</color>
+    <color name="onlineColor">#00b650</color>
 </resources>

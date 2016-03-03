@@ -38,6 +38,13 @@ public class UserInfoCache {
             });
 
     @Background(serial = SUGAR)
+    public void saveUsersInfo(List<UserInfo> userInfoList, UserInfoSaveCallback callback) {
+        mergeCached(userInfoList);
+        SugarRecord.saveInTx(userInfoList);
+        callback.onSaved(userInfoList);
+    }
+
+    @Background(serial = SUGAR)
     public void getUserInfo(String nick, UserInfoCallback callback) {
         try {
             UserInfo userInfo = getUserInfoSync(nick);
@@ -62,6 +69,21 @@ public class UserInfoCache {
         userInfoCache.putAll(values);
     }
 
+    @SupposeBackground(serial = SUGAR)
+    void mergeCached(List<UserInfo> userInfoList) {
+        for (int c = 0; c < userInfoList.size(); c++) {
+            UserInfo userInfo = userInfoList.get(c);
+            String nick = userInfo.getNick();
+            try {
+                UserInfo storedProject = userInfoCache.get(nick);
+                storedProject.update(userInfo);
+                userInfoList.set(c, storedProject);
+            } catch (ExecutionException e) {
+                userInfoCache.put(nick, userInfo);
+            }
+        }
+    }
+
     public class UserInfoNotFoundException extends Exception {
         private String nick;
 
@@ -81,5 +103,9 @@ public class UserInfoCache {
         void onUserInfo(UserInfo userInfo);
 
         void onNotFound();
+    }
+
+    public interface UserInfoSaveCallback {
+        void onSaved(List<UserInfo> userInfoList);
     }
 }

@@ -7,6 +7,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.orm.SugarRecord;
 import com.tomclaw.molecus.molecus.dto.Project;
+import com.tomclaw.molecus.molecus.dto.ProjectData;
 import com.tomclaw.molecus.molecus.dto.UserInfo;
 
 import org.androidannotations.annotations.Background;
@@ -14,6 +15,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SupposeBackground;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +88,7 @@ public class ProjectCache {
     public void saveProjects(List<Project> projects, ProjectsCallback callback) {
         mergeCached(projects);
 
+        List<ProjectData> projectDataList = new ArrayList<>();
         Map<String, UserInfo> userInfoMap = new HashMap<>();
         for (Project project : projects) {
             UserInfo userInfo = project.getUserInfo();
@@ -100,10 +103,12 @@ public class ProjectCache {
             }
             userInfoMap.put(nick, userInfo);
             project.setUserInfo(userInfo);
+            projectDataList.add(project.getData());
         }
 
         userInfoCache.save(userInfoMap);
 
+        SugarRecord.saveInTx(projectDataList);
         SugarRecord.saveInTx(projects);
 
         callback.onProjects(projects);
@@ -116,6 +121,7 @@ public class ProjectCache {
             String projectId = project.getProjectId();
             try {
                 Project storedProject = projectsCache.get(projectId);
+                storedProject.update(project);
                 projects.set(c, storedProject);
             } catch (ExecutionException e) {
                 projectsCache.put(projectId, project);

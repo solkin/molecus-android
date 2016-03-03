@@ -26,6 +26,10 @@
             android:name=".main.LoginActivity_"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".main.SubscribersActivity_"
+            android:label="@string/title_activity_subscribers"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <meta-data android:name="DATABASE" android:value="molecus.db" />
         <meta-data android:name="VERSION" android:value="1" />
         <meta-data android:name="QUERY_LOG" android:value="true" />

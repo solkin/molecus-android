@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_feed:
                 break;
             case R.id.nav_subscribers:
+                SubscribersActivity_.intent(this).start();
                 break;
             case R.id.nav_dialogs:
                 break;

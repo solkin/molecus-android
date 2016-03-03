@@ -29,4 +29,10 @@ public class ProjectData implements Unobfuscatable {
     public String getPlain() {
         return plain;
     }
+
+    public void update(ProjectData data) {
+        this.url_list = data.url_list;
+        this.html = data.html;
+        this.plain = data.plain;
+    }
 }
