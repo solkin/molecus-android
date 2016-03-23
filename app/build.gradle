@@ -43,6 +43,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.1'
     apt "org.androidannotations:androidannotations:$AAVersion"
     compile "org.androidannotations:androidannotations-api:$AAVersion"
+    compile 'com.jpardogo.googleprogressbar:library:1.2.0'
 }
 
 apt {

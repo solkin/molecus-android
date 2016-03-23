@@ -22,15 +22,18 @@ import com.tomclaw.molecus.core.RequestCallback;
 import com.tomclaw.molecus.core.RequestExecutor;
 import com.tomclaw.molecus.core.User;
 import com.tomclaw.molecus.core.UserHolder;
-import com.tomclaw.molecus.main.adapters.ProjectsAdapter;
+import com.tomclaw.molecus.main.adapters.EndlessAdapter;
+import com.tomclaw.molecus.main.adapters.EndlessProjectsAdapter;
 import com.tomclaw.molecus.main.controllers.ProjectCache;
 import com.tomclaw.molecus.main.controllers.UserInfoCache;
 import com.tomclaw.molecus.molecus.AllProjectsRequest;
+import com.tomclaw.molecus.molecus.ProjectsRequest;
 import com.tomclaw.molecus.molecus.ProjectsResponse;
 import com.tomclaw.molecus.molecus.SceneRequest;
 import com.tomclaw.molecus.molecus.UserProjectsRequest;
 import com.tomclaw.molecus.molecus.dto.Project;
 import com.tomclaw.molecus.molecus.dto.UserInfo;
+import com.tomclaw.molecus.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -42,7 +45,6 @@ import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -51,6 +53,7 @@ import java.util.concurrent.Future;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int BLOCK_PROJECTS_COUNT = 50;
     @ViewById
     Toolbar toolbar;
 
@@ -84,10 +87,13 @@ public class MainActivity extends AppCompatActivity
     @Bean
     ProjectCache projectCache;
 
-    ProjectsAdapter adapter;
+    EndlessProjectsAdapter adapter;
 
-    Request request;
+    ProjectsRequest request;
     Future<?> future;
+    private boolean endless;
+
+    private ActiveTab activeTab;
 
     @AfterViews
     void init() {
@@ -109,6 +115,7 @@ public class MainActivity extends AppCompatActivity
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                // TODO: clear list and reload from start.
                 refreshProjects();
             }
         });
@@ -116,7 +123,14 @@ public class MainActivity extends AppCompatActivity
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         list.setLayoutManager(linearLayoutManager);
         list.setHasFixedSize(false);
-        adapter = new ProjectsAdapter(this, Collections.<Project>emptyList());
+        adapter = new EndlessProjectsAdapter(this, new EndlessAdapter.EndlessAdapterListener() {
+            @Override
+            public void onLoadMoreItems(int offset) {
+                Logger.log("load more items: " + offset);
+                requestProjects(request.getOffset() + request.getCount());
+            }
+        });
+        adapter.setMoreItemsAvailable(false);
         list.setAdapter(adapter);
 
         navView.getMenu().getItem(0).setChecked(true);
@@ -140,11 +154,12 @@ public class MainActivity extends AppCompatActivity
         userLogin.setText(user.getLogin());
     }
 
-    void requestProjects(Request request) {
+    void requestProjects(ProjectsRequest request, boolean endless) {
         if (future != null && !future.isDone()) {
             future.cancel(true);
         }
         this.request = request;
+        this.endless = endless;
         refreshProjects();
     }
 
@@ -156,14 +171,21 @@ public class MainActivity extends AppCompatActivity
     @UiThread
     void refreshProjects() {
         if (request != null) {
-            future = requestExecutor.execute(request, new RequestCallback<ProjectsResponse>() {
+            final ProjectsRequest currentRequest = request;
+            future = requestExecutor.execute(currentRequest, new RequestCallback<ProjectsResponse>() {
                 @Override
                 public void onSuccess(ProjectsResponse response) {
+                    if (currentRequest != request) {
+                        return;
+                    }
                     List<Project> projects = response.getProjects();
                     projectCache.saveProjects(projects, new ProjectCache.ProjectsCallback() {
                         @Override
                         public void onProjects(List<Project> projects) {
-                            updateProjects(projects);
+                            boolean moreItems = !projects.isEmpty() && endless;
+                            adapter.setMoreItemsAvailable(moreItems);
+                            boolean append = currentRequest.getOffset() > 0 && endless;
+                            updateProjects(projects, append);
                         }
                     });
                 }
@@ -193,8 +215,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @UiThread
-    void updateProjects(List<Project> projects) {
-        adapter.setProjects(projects);
+    void updateProjects(List<Project> projects, boolean append) {
+        if (append) {
+            adapter.appendItems(projects);
+        } else {
+            adapter.setItems(projects);
+        }
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -229,28 +255,32 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        adapter.setMoreItemsAvailable(false);
         switch (id) {
             case R.id.nav_scene:
+                activeTab = ActiveTab.Scene;
                 setTitle(R.string.scene);
                 projectCache.getProjectsRandom(SceneRequest.SCENE_PROJECTS_COUNT, new ProjectCache.ProjectsCallback() {
                     @Override
                     public void onProjects(List<Project> projects) {
-                        updateProjects(projects);
-                        requestProjects(new SceneRequest());
+                        updateProjects(projects, false);
+                        requestProjects(0);
                     }
                 });
                 break;
             case R.id.nav_all_projects:
+                activeTab = ActiveTab.AllProjects;
                 setTitle(R.string.all_projects);
                 projectCache.getProjectsByLimit(50, new ProjectCache.ProjectsCallback() {
                     @Override
                     public void onProjects(List<Project> projects) {
-                        updateProjects(projects);
-                        requestProjects(new AllProjectsRequest(0, 100));
+                        updateProjects(projects, false);
+                        requestProjects(0);
                     }
                 });
                 break;
             case R.id.nav_my_projects:
+                activeTab = ActiveTab.MyProjects;
                 setTitle(R.string.my_projects);
                 userInfoCache.getUserInfo(userHolder.getUser().getNick(),
                         new UserInfoCache.UserInfoCallback() {
@@ -259,7 +289,7 @@ public class MainActivity extends AppCompatActivity
                                 projectCache.getProjectsByUserInfo(userInfo.getId(), new ProjectCache.ProjectsCallback() {
                                     @Override
                                     public void onProjects(List<Project> projects) {
-                                        updateProjects(projects);
+                                        updateProjects(projects, false);
                                         updateFromServer();
                                     }
                                 });
@@ -271,7 +301,7 @@ public class MainActivity extends AppCompatActivity
                             }
 
                             void updateFromServer() {
-                                requestProjects(new UserProjectsRequest(userHolder.getUser().getNick(), 0, 100));
+                                requestProjects(0);
                             }
                         });
                 break;
@@ -287,5 +317,25 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void requestProjects(int offset) {
+        switch(activeTab) {
+            case Scene:
+                requestProjects(new SceneRequest(), false);
+                break;
+            case AllProjects:
+                requestProjects(new AllProjectsRequest(offset, BLOCK_PROJECTS_COUNT), true);
+                break;
+            case MyProjects:
+                requestProjects(new UserProjectsRequest(userHolder.getUser().getNick(), offset, BLOCK_PROJECTS_COUNT), true);
+                break;
+        }
+    }
+
+    public enum ActiveTab {
+        Scene,
+        AllProjects,
+        MyProjects
     }
 }

@@ -27,6 +27,14 @@ public abstract class ProjectsRequest extends MolecusRequest<ProjectsResponse> {
         this.count = count;
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
     @Override
     protected String getApiName() {
         return "projects";
