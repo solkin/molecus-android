@@ -88,7 +88,7 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@mipmap/ic_view"
+                            android:src="@drawable/ic_view"
                             android:tint="@color/tintGrey"/>
 
                         <TextView
@@ -113,7 +113,7 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@mipmap/ic_like"
+                            android:src="@drawable/ic_like"
                             android:tint="@color/tintGrey"/>
 
                         <TextView
