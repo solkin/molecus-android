@@ -12,7 +12,6 @@ import com.tomclaw.molecus.core.Request;
 import com.tomclaw.molecus.core.RequestCallback;
 import com.tomclaw.molecus.core.RequestExecutor;
 import com.tomclaw.molecus.main.adapters.SubscribersAdapter;
-import com.tomclaw.molecus.main.controllers.UserInfoCache;
 import com.tomclaw.molecus.molecus.SubscribersRequest;
 import com.tomclaw.molecus.molecus.SubscribersResponse;
 import com.tomclaw.molecus.molecus.dto.UserInfo;
@@ -22,7 +21,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -44,9 +42,6 @@ public class SubscribersActivity extends AppCompatActivity {
 
     @ViewById
     SwipeRefreshLayout swipeRefreshLayout;
-
-    @Bean
-    UserInfoCache userInfoCache;
 
     @Bean
     RequestExecutor requestExecutor;
@@ -90,35 +85,35 @@ public class SubscribersActivity extends AppCompatActivity {
     void refreshSubscribers() {
         swipeRefreshLayout.setRefreshing(true);
         SubscribersRequest subscribersRequest = new SubscribersRequest();
-        requestExecutor.execute(subscribersRequest, new RequestCallback<SubscribersResponse>() {
+        requestExecutor.execute(subscribersRequest, new RequestCallback<SubscribersRequest, SubscribersResponse>() {
             @Override
-            public void onSuccess(SubscribersResponse response) {
-                List<UserInfo> userInfoList = response.getUsers();
-                userInfoCache.saveUsersInfo(userInfoList, new UserInfoCache.UserInfoSaveCallback() {
-                    @Override
-                    public void onSaved(List<UserInfo> userInfoList) {
-                        updateSubscribers(userInfoList);
-                    }
-                });
+            public void onSuccess(SubscribersRequest request, SubscribersResponse response) {
+//                List<UserInfo> userInfoList = response.getUsers();
+//                userInfoCache.saveUsersInfo(userInfoList, new UserInfoCache.UserInfoSaveCallback() {
+//                    @Override
+//                    public void onSaved(List<UserInfo> userInfoList) {
+//                        updateSubscribers(userInfoList);
+//                    }
+//                });
             }
 
             @Override
-            public void onFailed(Request.RequestException ex) {
+            public void onFailed(SubscribersRequest request, Request.RequestException ex) {
                 refreshSubscribersWithDelay();
             }
 
             @Override
-            public void onUnauthorized() {
+            public void onUnauthorized(SubscribersRequest request) {
                 // TODO: show authorization activity if running.
             }
 
             @Override
-            public void onRetry() {
+            public void onRetry(SubscribersRequest request) {
                 refreshSubscribers();
             }
 
             @Override
-            public void onCancelled() {
+            public void onCancelled(SubscribersRequest request) {
                 // Nothing to do at all.
             }
         });

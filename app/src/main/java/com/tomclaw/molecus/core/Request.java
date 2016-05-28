@@ -1,7 +1,6 @@
 package com.tomclaw.molecus.core;
 
 import android.content.Context;
-import com.orm.SugarRecord;
 import com.tomclaw.molecus.util.Unobfuscatable;
 
 /**
@@ -10,7 +9,7 @@ import com.tomclaw.molecus.util.Unobfuscatable;
  * Date: 6/9/13
  * Time: 7:25 PM
  */
-public abstract class Request<A extends Response> extends SugarRecord implements Unobfuscatable {
+public abstract class Request<A extends Response> implements Unobfuscatable {
 
     /**
      * Request types

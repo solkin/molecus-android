@@ -30,10 +30,11 @@
             android:name=".main.SubscribersActivity_"
             android:label="@string/title_activity_subscribers"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <meta-data android:name="DATABASE" android:value="molecus.db" />
-        <meta-data android:name="VERSION" android:value="1" />
-        <meta-data android:name="QUERY_LOG" android:value="true" />
-        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.tomclaw" />
+        <provider
+            android:name=".core.GlobalProvider"
+            android:authorities="com.tomclaw.molecus.core.GlobalProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" />
     </application>
 
 </manifest>

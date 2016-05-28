@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import com.jpardogo.android.googleprogressbar.library.FoldingCirclesDrawable;
 import com.tomclaw.molecus.R;
 
 import org.androidannotations.annotations.AfterViews;
@@ -31,9 +30,5 @@ public class ProgressView extends LinearLayout {
 
     @AfterViews
     void init() {
-        // ButterKnife.inject(this);
-        progress.setIndeterminateDrawable(
-                new FoldingCirclesDrawable.Builder(getContext())
-                        .build());
     }
 }

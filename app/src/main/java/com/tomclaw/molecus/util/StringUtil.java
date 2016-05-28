@@ -108,7 +108,11 @@ public class StringUtil {
     }
 
     public static String generateRandomString() {
-        return StringUtil.generateRandomString(random, 16, 16);
+        return generateRandomString(16);
+    }
+
+    public static String generateRandomString(int count) {
+        return StringUtil.generateRandomString(random, count, count);
     }
 
     public static String generateRandomString(Random r, int minChars, int maxChars) {

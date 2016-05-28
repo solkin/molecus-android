@@ -1,7 +1,5 @@
 package com.tomclaw.molecus.core;
 
-import com.orm.SugarRecord;
-
 /**
  * Created by Solkin on 04.11.2015.
  */

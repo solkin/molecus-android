@@ -1,7 +1,9 @@
 package com.tomclaw.molecus.main.views;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +23,9 @@ import org.androidannotations.annotations.ViewById;
  */
 @EViewGroup(R.layout.project_item)
 public class ProjectView extends LinearLayout {
+
+    @ViewById(R.id.card_view)
+    CardView cardView;
 
     @ViewById
     ImageView cover;
@@ -58,7 +63,7 @@ public class ProjectView extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    public void bindProject(Project project) {
+    public void bind(Project project) {
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(project.getCover(), cover, ImageOptions.getCoverOptions());
         title.setText(project.getTitle());
@@ -68,5 +73,9 @@ public class ProjectView extends LinearLayout {
         viewsCount.setText(String.valueOf(project.getViews()));
         likesCount.setText(String.valueOf(project.getLikes()));
         publishDate.setText(timeHelper.getFormattedDate(project.getTimeAdded() * 1000));
+    }
+
+    public void setClickListener(View.OnClickListener listener) {
+        cardView.setOnClickListener(listener);
     }
 }

@@ -29,7 +29,7 @@ public class RequestExecutor {
     UserHolder userHolder;
 
     public <S extends Response, R extends Request<S>> Future<?> execute(
-            R request, RequestCallback<S> callback) {
+            R request, RequestCallback<R, S> callback) {
         return executor.submit(new RequestWrapper<>(context, userHolder, request, callback));
     }
 
@@ -38,9 +38,9 @@ public class RequestExecutor {
         private final UserHolder userHolder;
         private WeakReference<Context> weakContext;
         private R request;
-        private RequestCallback<S> callback;
+        private RequestCallback<R, S> callback;
 
-        public RequestWrapper(Context context, UserHolder userHolder, R request, RequestCallback<S> callback) {
+        public RequestWrapper(Context context, UserHolder userHolder, R request, RequestCallback<R, S> callback) {
             this.weakContext = new WeakReference<>(context);
             this.userHolder = userHolder;
             this.request = request;
@@ -54,24 +54,24 @@ public class RequestExecutor {
                 try {
                     if (request.isUserBased() && !userHolder.getUser().isAuthorized()) {
                         if (!refreshToken(userHolder, context)) {
-                            callback.onUnauthorized();
+                            callback.onUnauthorized(request);
                             return;
                         }
                     }
                     S response = request.onRequest(userHolder, context);
                     if (response.isSuccess()) {
-                        callback.onSuccess(response);
+                        callback.onSuccess(request, response);
                     } else if (response.isUnauthorized()) {
                         if (refreshToken(userHolder, context)) {
-                            callback.onRetry();
+                            callback.onRetry(request);
                         } else {
-                            callback.onUnauthorized();
+                            callback.onUnauthorized(request);
                         }
                     }
                 } catch (Request.RequestCancelledException ex) {
-                    callback.onCancelled();
+                    callback.onCancelled(request);
                 } catch (Request.RequestException ex) {
-                    callback.onFailed(ex);
+                    callback.onFailed(request, ex);
                 }
             }
         }

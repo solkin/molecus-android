@@ -2,7 +2,6 @@ package com.tomclaw.molecus.main.adapters;
 
 import android.view.View;
 
-import com.tomclaw.molecus.main.views.ProgressView;
 import com.tomclaw.molecus.main.views.ProjectView;
 import com.tomclaw.molecus.molecus.dto.Project;
 
@@ -17,7 +16,7 @@ public class ProjectViewHolder extends EndlessAdapter.ItemViewHolder<Project> {
 
     @Override
     public void bindNormal(Project item) {
-        ((ProjectView)itemView).bindProject(item);
+        ((ProjectView) itemView).bind(item);
     }
 
     @Override

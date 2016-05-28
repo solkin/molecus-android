@@ -18,7 +18,7 @@ public class GsonSingleton {
 
     @AfterInject
     void init() {
-        gson = new GsonBuilder().setExclusionStrategies(new ExcludeFieldsStrategy()).create();
+        gson = new GsonBuilder().create();
     }
 
     public Gson getGson() {
