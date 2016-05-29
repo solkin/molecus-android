@@ -88,13 +88,8 @@ public class SubscribersActivity extends AppCompatActivity {
         requestExecutor.execute(subscribersRequest, new RequestCallback<SubscribersRequest, SubscribersResponse>() {
             @Override
             public void onSuccess(SubscribersRequest request, SubscribersResponse response) {
-//                List<UserInfo> userInfoList = response.getUsers();
-//                userInfoCache.saveUsersInfo(userInfoList, new UserInfoCache.UserInfoSaveCallback() {
-//                    @Override
-//                    public void onSaved(List<UserInfo> userInfoList) {
-//                        updateSubscribers(userInfoList);
-//                    }
-//                });
+                List<UserInfo> userInfoList = response.getUsers();
+                updateSubscribers(userInfoList);
             }
 
             @Override
