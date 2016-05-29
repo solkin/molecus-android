@@ -28,6 +28,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.SupposeUiThread;
@@ -71,15 +72,14 @@ public class MainActivity extends AppCompatActivity
     @Bean
     ProjectsLoadingController loadingController;
 
-    private ProjectsAdapter adapter;
+    @InstanceState
+    ActiveTab activeTab = ActiveTab.Scene;
 
-    private ActiveTab activeTab;
+    private ProjectsAdapter adapter;
 
     private ProjectsAdapter.OnItemShowListener showListener;
 
     private int lastProjectOffsetRequest = 0;
-
-    private int startTabIndex = 0;
 
     @AfterViews
     void init() {
@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity
         list.setHasFixedSize(false);
         list.setAdapter(adapter);
 
+        int startTabIndex = activeTab.ordinal();
         navView.getMenu().getItem(startTabIndex).setChecked(true);
         onNavigationItemSelected(navView.getMenu().getItem(startTabIndex));
 
