@@ -19,10 +19,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.tomclaw.molecus.R;
 import com.tomclaw.molecus.core.User;
 import com.tomclaw.molecus.core.UserHolder;
-import com.tomclaw.molecus.main.adapters.AllProjectsAdapter;
 import com.tomclaw.molecus.main.adapters.ProjectsAdapter;
-import com.tomclaw.molecus.main.adapters.SceneAdapter;
-import com.tomclaw.molecus.main.adapters.UserProjectsAdapter;
 import com.tomclaw.molecus.main.controllers.ProjectsLoadingController;
 import com.tomclaw.molecus.molecus.ProjectsRequest;
 import com.tomclaw.molecus.molecus.dto.Project;
@@ -36,6 +33,8 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.List;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main)
@@ -80,6 +79,8 @@ public class MainActivity extends AppCompatActivity
 
     private int lastProjectOffsetRequest = 0;
 
+    private int startTabIndex = 0;
+
     @AfterViews
     void init() {
         if (!userHolder.getUser().isAuthorized()) {
@@ -98,13 +99,12 @@ public class MainActivity extends AppCompatActivity
                 if (request != null && request.getOffset() == offset) {
                     return true;
                 } else if (lastProjectOffsetRequest != offset) {
+                    lastProjectOffsetRequest = offset;
                     switch (activeTab) {
                         case AllProjects:
-                            lastProjectOffsetRequest = offset;
                             loadingController.requestAllProjects(offset, BLOCK_PROJECTS_COUNT);
                             return true;
                         case MyProjects:
-                            lastProjectOffsetRequest = offset;
                             loadingController.requestUserProjects(userHolder.getUser().getNick(),
                                     offset, BLOCK_PROJECTS_COUNT);
                             return true;
@@ -129,13 +129,17 @@ public class MainActivity extends AppCompatActivity
                 requestProjects(0);
             }
         });
+        
+        adapter = new ProjectsAdapter(this);
+        adapter.setShowListener(showListener);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         list.setLayoutManager(linearLayoutManager);
         list.setHasFixedSize(false);
+        list.setAdapter(adapter);
 
-        navView.getMenu().getItem(1).setChecked(true);
-        onNavigationItemSelected(navView.getMenu().getItem(1));
+        navView.getMenu().getItem(startTabIndex).setChecked(true);
+        onNavigationItemSelected(navView.getMenu().getItem(startTabIndex));
 
         View header = navView.getHeaderView(0);
         userAvatar = (ImageView) header.findViewById(R.id.user_avatar);
@@ -149,6 +153,10 @@ public class MainActivity extends AppCompatActivity
     void requestProjects(int offset) {
         if (!swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);
+        }
+        if (offset < lastProjectOffsetRequest) {
+            adapter.clear();
+            lastProjectOffsetRequest = 0;
         }
         switch (activeTab) {
             case Scene:
@@ -165,7 +173,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     @UiThread
-    public void onLoaded() {
+    public void onLoaded(List<Project> projects) {
+        adapter.add(projects);
+        adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -175,11 +185,10 @@ public class MainActivity extends AppCompatActivity
         Snackbar.make(list, "Seems that you unauthorized", Snackbar.LENGTH_LONG).show();
     }
 
-    private void switchAdapter(final ProjectsAdapter projectsAdapter) {
+    private void resetAdapter() {
         lastProjectOffsetRequest = 0;
-        adapter = projectsAdapter;
-        adapter.setShowListener(showListener);
-        list.setAdapter(adapter);
+        adapter.clear();
+        adapter.notifyDataSetChanged();
     }
 
     @SupposeUiThread
@@ -225,19 +234,19 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_scene:
                 activeTab = ActiveTab.Scene;
                 setTitle(R.string.scene);
-                switchAdapter(new SceneAdapter(this, getSupportLoaderManager()));
+                resetAdapter();
                 requestProjects(0);
                 break;
             case R.id.nav_all_projects:
                 activeTab = ActiveTab.AllProjects;
                 setTitle(R.string.all_projects);
-                switchAdapter(new AllProjectsAdapter(this, getSupportLoaderManager()));
+                resetAdapter();
                 requestProjects(0);
                 break;
             case R.id.nav_my_projects:
                 activeTab = ActiveTab.MyProjects;
                 setTitle(R.string.my_projects);
-                switchAdapter(new UserProjectsAdapter(this, getSupportLoaderManager()));
+                resetAdapter();
                 requestProjects(0);
                 break;
             case R.id.nav_feed:

@@ -20,6 +20,7 @@ import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.UiThread;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import static com.tomclaw.molecus.main.Beans.contentResolver;
@@ -43,11 +44,11 @@ public class ProjectsLoadingController {
                 @Override
                 public void onSuccess(ProjectsRequest request, ProjectsResponse response) {
                     ArrayList<Project> projects = new ArrayList<>(response.getProjects());
-                    Bundle extras = new Bundle();
-                    extras.putSerializable(GlobalProvider.KEY_PROJECTS, projects);
-                    contentResolver().call(Settings.PROJECTS_RESOLVER_URI,
-                            GlobalProvider.METHOD_PROJECTS_MERGE, null, extras);
-                    onLoaded(request);
+//                    Bundle extras = new Bundle();
+//                    extras.putSerializable(GlobalProvider.KEY_PROJECTS, projects);
+//                    contentResolver().call(Settings.PROJECTS_RESOLVER_URI,
+//                            GlobalProvider.METHOD_PROJECTS_MERGE, null, extras);
+                    onLoaded(request, projects);
                     reset(request);
                 }
 
@@ -134,15 +135,15 @@ public class ProjectsLoadingController {
         }
     }
 
-    private void onLoaded(ProjectsRequest request) {
+    private void onLoaded(ProjectsRequest request, List<Project> projects) {
         if (this.request == request) {
-            loadingCallback.onLoaded();
+            loadingCallback.onLoaded(projects);
         }
     }
 
     public interface LoadingCallback {
 
-        void onLoaded();
+        void onLoaded(List<Project> projects);
         void onUnauthorized();
     }
 }

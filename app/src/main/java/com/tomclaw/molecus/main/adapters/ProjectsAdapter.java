@@ -1,39 +1,30 @@
 package com.tomclaw.molecus.main.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tomclaw.molecus.core.Settings;
 import com.tomclaw.molecus.main.views.ProjectView;
 import com.tomclaw.molecus.main.views.ProjectView_;
 import com.tomclaw.molecus.molecus.dto.Project;
-import com.tomclaw.molecus.util.Logger;
-import com.tomclaw.molecus.util.QueryBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by solkin on 02.02.16.
  */
-public abstract class ProjectsAdapter extends CursorRecyclerAdapter<ProjectsAdapter.ProjectViewHolder>
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.ProjectViewHolder> {
 
+    private final List<Project> items = new ArrayList<>();
     private Context context;
-    private LoaderManager loaderManager;
-    private int adapterId;
     private OnItemClickListener clickListener;
     private OnItemShowListener showListener;
 
-    public ProjectsAdapter(Context context, LoaderManager loaderManager, int adapterId) {
-        super(null);
+    public ProjectsAdapter(Context context) {
         this.context = context;
-        this.loaderManager = loaderManager;
-        this.adapterId = adapterId;
-        loaderManager.initLoader(adapterId, null, this);
+        setHasStableIds(true);
     }
 
     public void setClickListener(OnItemClickListener clickListener) {
@@ -44,42 +35,38 @@ public abstract class ProjectsAdapter extends CursorRecyclerAdapter<ProjectsAdap
         this.showListener = showListener;
     }
 
-    @Override
-    public void onBindViewHolderCursor(ProjectViewHolder holder, Cursor cursor) {
-        Project project = Project.fromCursor(cursor);
-        boolean showProgress = false;
-        if (cursor.isLast() && showListener != null) {
-            showProgress = showListener.onLastItem(cursor.getPosition(), project);
-        }
-        holder.bind(project, showProgress);
+    public void add(List<Project> projects) {
+        items.addAll(projects);
+    }
+
+    public void clear() {
+        items.clear();
     }
 
     @Override
-    public ProjectViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public ProjectViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ProjectView projectView = ProjectView_.build(context);
         return new ProjectViewHolder(projectView);
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        QueryBuilder queryBuilder = configureQuery(new QueryBuilder());
-        return queryBuilder.createCursorLoader(context, Settings.PROJECTS_RESOLVER_URI);
-    }
-
-    public abstract QueryBuilder configureQuery(QueryBuilder queryBuilder);
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        swapCursor(cursor);
+    public void onBindViewHolder(ProjectViewHolder holder, int position) {
+        Project project = items.get(position);
+        boolean showProgress = false;
+        if (position == items.size() - 1 && showListener != null) {
+            showProgress = showListener.onLastItem(position, project);
+        }
+        holder.bind(project, showProgress);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        changeCursor(null);
+    public int getItemCount() {
+        return items.size();
     }
 
-    public void destroy() {
-        loaderManager.destroyLoader(adapterId);
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     class ProjectViewHolder extends RecyclerView.ViewHolder {
@@ -96,9 +83,9 @@ public abstract class ProjectsAdapter extends CursorRecyclerAdapter<ProjectsAdap
             projectView.setClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Cursor cursor = getCursor();
-                    if (cursor != null && cursor.moveToPosition(getPosition())) {
-                        Project project = Project.fromCursor(cursor);
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        Project project = items.get(position);
                         if (clickListener != null) {
                             clickListener.onItemClick(project);
                         }
