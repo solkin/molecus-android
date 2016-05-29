@@ -2,6 +2,7 @@ package com.tomclaw.molecus.molecus;
 
 import com.tomclaw.molecus.core.JsonRequest;
 import com.tomclaw.molecus.core.Response;
+import com.tomclaw.molecus.core.Settings;
 import com.tomclaw.molecus.util.HttpParamsBuilder;
 import com.tomclaw.molecus.util.HttpUtil;
 
@@ -10,7 +11,7 @@ import com.tomclaw.molecus.util.HttpUtil;
  */
 public abstract class MolecusRequest<A extends Response> extends JsonRequest<A> {
 
-    public static final String API_BASE_URL = "http://dev.molecus.ru/api/";
+    public static final String API_BASE_URL = DevHelper.fixUrls("http://molecus.ru/api/");
 
     @Override
     protected String getHttpRequestType() {

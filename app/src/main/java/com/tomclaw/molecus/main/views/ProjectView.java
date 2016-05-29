@@ -48,6 +48,9 @@ public class ProjectView extends LinearLayout {
     @ViewById
     TextView publishDate;
 
+    @ViewById
+    View progress;
+
     @Bean
     TimeHelper timeHelper;
 
@@ -63,7 +66,7 @@ public class ProjectView extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    public void bind(Project project) {
+    public void bind(Project project, boolean showProgress) {
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(project.getCover(), cover, ImageOptions.getCoverOptions());
         title.setText(project.getTitle());
@@ -73,6 +76,7 @@ public class ProjectView extends LinearLayout {
         viewsCount.setText(String.valueOf(project.getViews()));
         likesCount.setText(String.valueOf(project.getLikes()));
         publishDate.setText(timeHelper.getFormattedDate(project.getTimeAdded() * 1000));
+        progress.setVisibility(showProgress ? VISIBLE : GONE);
     }
 
     public void setClickListener(View.OnClickListener listener) {

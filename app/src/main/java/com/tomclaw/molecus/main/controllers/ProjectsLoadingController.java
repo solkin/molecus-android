@@ -79,6 +79,13 @@ public class ProjectsLoadingController {
         this.loadingCallback = loadingCallback;
     }
 
+    public ProjectsRequest getActiveRequest() {
+        if (future != null && !future.isDone()) {
+            return request;
+        }
+        return null;
+    }
+
     @UiThread(propagation = UiThread.Propagation.REUSE)
     public void requestScene() {
         request(new SceneRequest());

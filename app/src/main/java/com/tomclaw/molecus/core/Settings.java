@@ -7,7 +7,7 @@ import android.net.Uri;
  */
 public class Settings {
     public static final String LOG_TAG = "molecus-app";
-    public static final boolean DEV = true;
+    public static final boolean DEV = false;
     public static String DB_NAME = "molecus_db";
     public static int DB_VERSION = 1;
     public static String GLOBAL_AUTHORITY = "com.tomclaw.molecus.core.GlobalProvider";

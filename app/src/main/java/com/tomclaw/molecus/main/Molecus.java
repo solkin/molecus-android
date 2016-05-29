@@ -50,7 +50,7 @@ public class Molecus extends Application {
         config.diskCacheSize(75 * 1024 * 1024);
         config.memoryCacheSize(25 * 1024 * 1024);
         config.tasksProcessingOrder(QueueProcessingType.LIFO);
-        config.writeDebugLogs(); // Remove for release app
+        // config.writeDebugLogs(); // Remove for release app
 
         // Initialize ImageLoader with configuration.
         ImageLoader.getInstance().init(config.build());

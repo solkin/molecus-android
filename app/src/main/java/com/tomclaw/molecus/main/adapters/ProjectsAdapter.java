@@ -13,6 +13,7 @@ import com.tomclaw.molecus.core.Settings;
 import com.tomclaw.molecus.main.views.ProjectView;
 import com.tomclaw.molecus.main.views.ProjectView_;
 import com.tomclaw.molecus.molecus.dto.Project;
+import com.tomclaw.molecus.util.Logger;
 import com.tomclaw.molecus.util.QueryBuilder;
 
 /**
@@ -25,6 +26,7 @@ public abstract class ProjectsAdapter extends CursorRecyclerAdapter<ProjectsAdap
     private LoaderManager loaderManager;
     private int adapterId;
     private OnItemClickListener clickListener;
+    private OnItemShowListener showListener;
 
     public ProjectsAdapter(Context context, LoaderManager loaderManager, int adapterId) {
         super(null);
@@ -38,10 +40,18 @@ public abstract class ProjectsAdapter extends CursorRecyclerAdapter<ProjectsAdap
         this.clickListener = clickListener;
     }
 
+    public void setShowListener(OnItemShowListener showListener) {
+        this.showListener = showListener;
+    }
+
     @Override
     public void onBindViewHolderCursor(ProjectViewHolder holder, Cursor cursor) {
         Project project = Project.fromCursor(cursor);
-        holder.bind(project);
+        boolean showProgress = false;
+        if (cursor.isLast() && showListener != null) {
+            showProgress = showListener.onLastItem(cursor.getPosition(), project);
+        }
+        holder.bind(project, showProgress);
     }
 
     @Override
@@ -81,8 +91,8 @@ public abstract class ProjectsAdapter extends CursorRecyclerAdapter<ProjectsAdap
             this.projectView = projectView;
         }
 
-        public void bind(Project project) {
-            projectView.bind(project);
+        public void bind(Project project, boolean showProgress) {
+            projectView.bind(project, showProgress);
             projectView.setClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -100,5 +110,9 @@ public abstract class ProjectsAdapter extends CursorRecyclerAdapter<ProjectsAdap
 
     public interface OnItemClickListener {
         void onItemClick(Project project);
+    }
+
+    public interface OnItemShowListener {
+        boolean onLastItem(int position, Project project);
     }
 }

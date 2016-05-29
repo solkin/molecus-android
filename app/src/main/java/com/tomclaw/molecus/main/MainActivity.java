@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.tomclaw.molecus.R;
@@ -25,6 +24,8 @@ import com.tomclaw.molecus.main.adapters.ProjectsAdapter;
 import com.tomclaw.molecus.main.adapters.SceneAdapter;
 import com.tomclaw.molecus.main.adapters.UserProjectsAdapter;
 import com.tomclaw.molecus.main.controllers.ProjectsLoadingController;
+import com.tomclaw.molecus.molecus.ProjectsRequest;
+import com.tomclaw.molecus.molecus.dto.Project;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -39,7 +40,8 @@ import org.androidannotations.annotations.ViewById;
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main)
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ProjectsLoadingController.LoadingCallback {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        ProjectsLoadingController.LoadingCallback {
 
     private static final int BLOCK_PROJECTS_COUNT = 50;
 
@@ -74,6 +76,10 @@ public class MainActivity extends AppCompatActivity
 
     private ActiveTab activeTab;
 
+    private ProjectsAdapter.OnItemShowListener showListener;
+
+    private int lastProjectOffsetRequest = 0;
+
     @AfterViews
     void init() {
         if (!userHolder.getUser().isAuthorized()) {
@@ -83,6 +89,30 @@ public class MainActivity extends AppCompatActivity
         }
 
         loadingController.setLoadingCallback(this);
+
+        showListener = new ProjectsAdapter.OnItemShowListener() {
+            @Override
+            public boolean onLastItem(int position, Project project) {
+                int offset = position + 1;
+                ProjectsRequest request = loadingController.getActiveRequest();
+                if (request != null && request.getOffset() == offset) {
+                    return true;
+                } else if (lastProjectOffsetRequest != offset) {
+                    switch (activeTab) {
+                        case AllProjects:
+                            lastProjectOffsetRequest = offset;
+                            loadingController.requestAllProjects(offset, BLOCK_PROJECTS_COUNT);
+                            return true;
+                        case MyProjects:
+                            lastProjectOffsetRequest = offset;
+                            loadingController.requestUserProjects(userHolder.getUser().getNick(),
+                                    offset, BLOCK_PROJECTS_COUNT);
+                            return true;
+                    }
+                }
+                return false;
+            }
+        };
 
         setSupportActionBar(toolbar);
 
@@ -104,8 +134,8 @@ public class MainActivity extends AppCompatActivity
         list.setLayoutManager(linearLayoutManager);
         list.setHasFixedSize(false);
 
-        navView.getMenu().getItem(0).setChecked(true);
-        onNavigationItemSelected(navView.getMenu().getItem(0));
+        navView.getMenu().getItem(1).setChecked(true);
+        onNavigationItemSelected(navView.getMenu().getItem(1));
 
         View header = navView.getHeaderView(0);
         userAvatar = (ImageView) header.findViewById(R.id.user_avatar);
@@ -146,7 +176,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void switchAdapter(final ProjectsAdapter projectsAdapter) {
+        lastProjectOffsetRequest = 0;
         adapter = projectsAdapter;
+        adapter.setShowListener(showListener);
         list.setAdapter(adapter);
     }
 

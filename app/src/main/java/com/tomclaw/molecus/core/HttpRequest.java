@@ -103,8 +103,7 @@ public abstract class HttpRequest<A extends Response> extends Request<A> {
         // Obtain request-specific url.
         String url = getUrl();
         String parameters = getParams().build();
-        Logger.log("try to send request to ".concat(url).concat(" with parameters: ")
-                .concat(QUE).concat(parameters));
+        Logger.log("API request: ".concat(url).concat(QUE).concat(parameters));
         if (!TextUtils.isEmpty(parameters)) {
             url = url.concat(QUE).concat(parameters);
         }
