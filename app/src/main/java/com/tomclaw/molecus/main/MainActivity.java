@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity
                 requestProjects(0);
             }
         });
-        
+
         adapter = new ProjectsAdapter(this);
         adapter.setShowListener(showListener);
 
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
         if (!swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);
         }
-        if (offset < lastProjectOffsetRequest) {
+        if (offset == 0) {
             adapter.clear();
             lastProjectOffsetRequest = 0;
         }

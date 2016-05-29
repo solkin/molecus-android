@@ -1,5 +1,7 @@
 package com.tomclaw.molecus.molecus;
 
+import android.text.TextUtils;
+
 import com.google.gson.reflect.TypeToken;
 import com.tomclaw.molecus.molecus.dto.Project;
 import com.tomclaw.molecus.util.HttpParamsBuilder;
@@ -59,7 +61,11 @@ public abstract class ProjectsRequest extends MolecusRequest<ProjectsResponse> {
     protected ProjectsResponse parseJson(JSONObject response) throws JSONException, RequestPendingException {
         int status = response.getInt("status");
         if (status == 200) {
-            int total = response.getInt("total");
+            String totalField = response.getString("total");
+            int total = 0;
+            if (!TextUtils.isEmpty(totalField) && TextUtils.isDigitsOnly(totalField)) {
+                total = Integer.parseInt(totalField);
+            }
             String projectsJson = response.getJSONArray("projects").toString();
             Type listType = new TypeToken<ArrayList<Project>>() {}.getType();
             List<Project> projects = gsonSingleton().fromJson(projectsJson, listType);
