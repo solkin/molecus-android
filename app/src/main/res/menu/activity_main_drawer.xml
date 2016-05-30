@@ -13,6 +13,10 @@
             android:icon="@drawable/ic_all_projects"
             android:title="@string/all_projects" />
         <item
+            android:id="@+id/nav_voting"
+            android:icon="@drawable/ic_poll"
+            android:title="@string/voting" />
+        <item
             android:id="@+id/nav_my_projects"
             android:icon="@drawable/ic_my_projects"
             android:title="@string/my_projects" />

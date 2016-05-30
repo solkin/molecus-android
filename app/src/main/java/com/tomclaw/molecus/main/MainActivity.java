@@ -104,6 +104,9 @@ public class MainActivity extends AppCompatActivity
                         case AllProjects:
                             loadingController.requestAllProjects(offset, BLOCK_PROJECTS_COUNT);
                             return true;
+                        case Voting:
+                            loadingController.requestVoting(offset, BLOCK_PROJECTS_COUNT);
+                            return true;
                         case MyProjects:
                             loadingController.requestUserProjects(userHolder.getUser().getNick(),
                                     offset, BLOCK_PROJECTS_COUNT);
@@ -155,16 +158,15 @@ public class MainActivity extends AppCompatActivity
         if (!swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);
         }
-        if (offset == 0) {
-            adapter.clear();
-            lastProjectOffsetRequest = 0;
-        }
         switch (activeTab) {
             case Scene:
                 loadingController.requestScene();
                 break;
             case AllProjects:
                 loadingController.requestAllProjects(offset, BLOCK_PROJECTS_COUNT);
+                break;
+            case Voting:
+                loadingController.requestVoting(offset, BLOCK_PROJECTS_COUNT);
                 break;
             case MyProjects:
                 loadingController.requestUserProjects(userHolder.getUser().getNick(), offset, BLOCK_PROJECTS_COUNT);
@@ -174,7 +176,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     @UiThread
-    public void onLoaded(List<Project> projects) {
+    public void onLoaded(int offset, List<Project> projects) {
+        if (offset == 0) {
+            resetAdapter();
+        }
         adapter.add(projects);
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
@@ -250,6 +255,12 @@ public class MainActivity extends AppCompatActivity
                 resetAdapter();
                 requestProjects(0);
                 break;
+            case R.id.nav_voting:
+                activeTab = ActiveTab.Voting;
+                setTitle(R.string.voting);
+                resetAdapter();
+                requestProjects(0);
+                break;
             case R.id.nav_feed:
                 break;
             case R.id.nav_subscribers:
@@ -266,6 +277,7 @@ public class MainActivity extends AppCompatActivity
     public enum ActiveTab {
         Scene,
         AllProjects,
+        Voting,
         MyProjects
     }
 }

@@ -22,6 +22,7 @@
 
     <string name="scene">Сцена</string>
     <string name="all_projects">Все проекты</string>
+    <string name="voting">Голосование</string>
     <string name="my_projects">Мои проекты</string>
     <string name="feed">Лента</string>
     <string name="subscribers">Друзья</string>

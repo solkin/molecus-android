@@ -12,6 +12,7 @@ import com.tomclaw.molecus.molecus.ProjectsRequest;
 import com.tomclaw.molecus.molecus.ProjectsResponse;
 import com.tomclaw.molecus.molecus.SceneRequest;
 import com.tomclaw.molecus.molecus.UserProjectsRequest;
+import com.tomclaw.molecus.molecus.VotingRequest;
 import com.tomclaw.molecus.molecus.dto.Project;
 
 import org.androidannotations.annotations.Bean;
@@ -98,6 +99,11 @@ public class ProjectsLoadingController {
     }
 
     @UiThread(propagation = UiThread.Propagation.REUSE)
+    public void requestVoting(int offset, int count) {
+        request(new VotingRequest(offset, count));
+    }
+
+    @UiThread(propagation = UiThread.Propagation.REUSE)
     public void requestUserProjects(String user, int offset, int count) {
         request(new UserProjectsRequest(user, offset, count));
     }
@@ -137,13 +143,13 @@ public class ProjectsLoadingController {
 
     private void onLoaded(ProjectsRequest request, List<Project> projects) {
         if (this.request == request) {
-            loadingCallback.onLoaded(projects);
+            loadingCallback.onLoaded(request.getOffset(), projects);
         }
     }
 
     public interface LoadingCallback {
 
-        void onLoaded(List<Project> projects);
+        void onLoaded(int offset, List<Project> projects);
         void onUnauthorized();
     }
 }
