@@ -6,6 +6,6 @@ curl \
   -F "notes=Build #$BUDDYBUILD_BUILD_NUMBER" \
   -F "notes_type=0" \
   -F "ipa=@$BUDDYBUILD_WORKSPACE/app/build/outputs/apk/app-release.apk" \
-  -F "dsym=@$BUDDYBUILD_WORKSPACE/app/build/outputs/mapping/release/mapping.txt" \
+  -F "dsym=@$BUDDYBUILD_WORKSPACE/app/build/outputs/proguard/release/mapping.txt" \
   -H "X-HockeyAppToken: $HOCKEY_API_TOKEN" \
   https://rink.hockeyapp.net/api/2/apps/$HOCKEY_APP_ID/app_versions/upload
