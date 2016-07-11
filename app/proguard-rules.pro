@@ -15,7 +15,33 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keepattributes SourceFile,LineNumberTable
 
+-assumenosideeffects class android.util.Log {
+  public static int d(...);
+}
+
+-keepclassmembers class net.hockeyapp.android.UpdateFragment {
+  *;
+}
+-keep class com.tomclaw.molecus.util.Unobfuscatable
+-keep class * implements com.tomclaw.molecus.util.Unobfuscatable
+-keepclassmembernames class * implements com.tomclaw.molecus.util.Unobfuscatable {
+  !transient <fields>;
+}
+-keepnames class * implements com.tomclaw.molecus.util.Unobfuscatable {
+  !transient <fields>;
+}
+-keepclassmembers class * implements com.tomclaw.molecus.util.Unobfuscatable {
+  <init>(...);
+}
+
+# Gson specific
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class sun.misc.Unsafe { *; }
+
+# Support
 -dontwarn android.support.v7.**
 -keep class android.support.v7.** { *; }
 -keep interface android.support.v7.** { *; }
