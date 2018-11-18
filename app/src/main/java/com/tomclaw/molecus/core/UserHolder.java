@@ -1,6 +1,7 @@
 package com.tomclaw.molecus.core;
 
 import android.content.Context;
+
 import com.tomclaw.molecus.util.GsonSingleton;
 import com.tomclaw.molecus.util.Logger;
 
@@ -9,7 +10,13 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 /**
  * Created by Igor on 03.07.2015.

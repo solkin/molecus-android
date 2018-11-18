@@ -1,6 +1,7 @@
 package com.tomclaw.molecus.core;
 
 import android.content.Context;
+
 import com.tomclaw.molecus.util.Unobfuscatable;
 
 /**

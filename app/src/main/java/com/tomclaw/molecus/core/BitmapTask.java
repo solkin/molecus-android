@@ -3,8 +3,6 @@ package com.tomclaw.molecus.core;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 
-import com.tomclaw.molecus.main.Molecus;
-
 import static com.tomclaw.molecus.main.Beans.bitmapCache;
 
 /**

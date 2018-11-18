@@ -1,6 +1,7 @@
 package com.tomclaw.molecus.core;
 
 import android.text.TextUtils;
+
 import com.tomclaw.molecus.util.HttpParamsBuilder;
 import com.tomclaw.molecus.util.HttpUtil;
 import com.tomclaw.molecus.util.Logger;

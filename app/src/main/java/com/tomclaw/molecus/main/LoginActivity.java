@@ -1,6 +1,5 @@
 package com.tomclaw.molecus.main;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;

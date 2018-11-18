@@ -1,7 +1,6 @@
 package com.tomclaw.molecus.main;
 
 import android.content.ContentResolver;
-import android.content.Context;
 
 import com.tomclaw.molecus.core.BitmapCache;
 import com.tomclaw.molecus.core.BitmapCache_;

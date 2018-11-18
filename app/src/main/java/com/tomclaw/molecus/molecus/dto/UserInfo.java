@@ -1,6 +1,5 @@
 package com.tomclaw.molecus.molecus.dto;
 
-import com.tomclaw.molecus.molecus.DevHelper;
 import com.tomclaw.molecus.util.Unobfuscatable;
 
 /**

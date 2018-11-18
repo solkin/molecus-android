@@ -1,12 +1,8 @@
 package com.tomclaw.molecus.main.controllers;
 
-import android.os.Bundle;
-
-import com.tomclaw.molecus.core.GlobalProvider;
 import com.tomclaw.molecus.core.Request;
 import com.tomclaw.molecus.core.RequestCallback;
 import com.tomclaw.molecus.core.RequestExecutor;
-import com.tomclaw.molecus.core.Settings;
 import com.tomclaw.molecus.molecus.AllProjectsRequest;
 import com.tomclaw.molecus.molecus.ProjectsRequest;
 import com.tomclaw.molecus.molecus.ProjectsResponse;
@@ -23,8 +19,6 @@ import org.androidannotations.annotations.UiThread;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
-
-import static com.tomclaw.molecus.main.Beans.contentResolver;
 
 /**
  * Created by solkin on 28.05.16.
@@ -75,7 +69,7 @@ public class ProjectsLoadingController {
                 public void onCancelled(ProjectsRequest request) {
                     reset(request);
                 }
-    };
+            };
 
     public void setLoadingCallback(LoadingCallback loadingCallback) {
         this.loadingCallback = loadingCallback;
@@ -150,6 +144,7 @@ public class ProjectsLoadingController {
     public interface LoadingCallback {
 
         void onLoaded(int offset, List<Project> projects);
+
         void onUnauthorized();
     }
 }

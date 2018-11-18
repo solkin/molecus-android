@@ -2,6 +2,7 @@ package com.tomclaw.molecus.core;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+
 import com.tomclaw.molecus.R;
 
 import java.lang.ref.WeakReference;

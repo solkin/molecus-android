@@ -3,7 +3,6 @@ package com.tomclaw.molecus.util;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 

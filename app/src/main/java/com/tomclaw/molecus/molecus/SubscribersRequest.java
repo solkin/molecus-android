@@ -37,7 +37,8 @@ public class SubscribersRequest extends MolecusRequest<SubscribersResponse> {
         int status = response.getInt("status");
         if (status == 200) {
             String usersJson = response.getJSONArray("users").toString();
-            Type listType = new TypeToken<ArrayList<UserInfo>>() {}.getType();
+            Type listType = new TypeToken<ArrayList<UserInfo>>() {
+            }.getType();
             List<UserInfo> users = gsonSingleton().fromJson(usersJson, listType);
             return new SubscribersResponse(status, users);
         }

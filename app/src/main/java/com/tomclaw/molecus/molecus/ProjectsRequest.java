@@ -67,7 +67,8 @@ public abstract class ProjectsRequest extends MolecusRequest<ProjectsResponse> {
                 total = Integer.parseInt(totalField);
             }
             String projectsJson = response.getJSONArray("projects").toString();
-            Type listType = new TypeToken<ArrayList<Project>>() {}.getType();
+            Type listType = new TypeToken<ArrayList<Project>>() {
+            }.getType();
             List<Project> projects = gsonSingleton().fromJson(projectsJson, listType);
             return new ProjectsResponse(status, total, projects);
         }

@@ -2,6 +2,7 @@ package com.tomclaw.molecus.main;
 
 import android.app.Application;
 import android.content.Context;
+
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;

@@ -220,7 +220,7 @@ public class RequestDispatcher {
                         executingRequestTag = null;
                     }
 
-                // Checking for request result.
+                    // Checking for request result.
                     if (requestResult == Request.REQUEST_DELETE) {
                         // Result is delete-type.
                         log("Result is delete-type");

@@ -1,6 +1,7 @@
 package com.tomclaw.molecus.util;
 
 import android.util.Log;
+
 import com.tomclaw.molecus.core.Settings;
 
 /**

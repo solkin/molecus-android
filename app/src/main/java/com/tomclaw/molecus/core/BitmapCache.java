@@ -8,14 +8,18 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.LruCache;
 
-import com.tomclaw.molecus.main.Molecus;
 import com.tomclaw.molecus.util.BitmapHelper;
 import com.tomclaw.molecus.util.Logger;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

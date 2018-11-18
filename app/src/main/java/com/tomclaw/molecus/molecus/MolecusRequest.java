@@ -2,7 +2,6 @@ package com.tomclaw.molecus.molecus;
 
 import com.tomclaw.molecus.core.JsonRequest;
 import com.tomclaw.molecus.core.Response;
-import com.tomclaw.molecus.core.Settings;
 import com.tomclaw.molecus.util.HttpParamsBuilder;
 import com.tomclaw.molecus.util.HttpUtil;
 
