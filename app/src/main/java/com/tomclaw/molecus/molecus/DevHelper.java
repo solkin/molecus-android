@@ -9,7 +9,10 @@ public class DevHelper {
 
     public static String fixUrls(String url) {
         if (!url.startsWith("http")) {
-            url = "http://molecus.ru/" + url;
+            url = "https://molecus.ru/" + url;
+        }
+        if (url.startsWith("http://")) {
+            url = "https://" + url.substring(7);
         }
         if (Settings.DEV) {
             url = url.replace("/molecus.", "/dev.molecus.");
